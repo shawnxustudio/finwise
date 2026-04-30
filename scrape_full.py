@@ -129,13 +129,23 @@ def save_json(path, data):
 def parse_time(time_str):
     if not time_str:
         return None
-    try:
-        time_str = time_str.strip()
-        if len(time_str) <= 10:
-            return datetime.strptime(time_str, "%Y-%m-%d")
-        return datetime.strptime(time_str, "%Y-%m-%d %H:%M")
-    except Exception:
-        return None
+    time_str = time_str.strip()
+    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(time_str, fmt)
+        except ValueError:
+            pass
+    # 非零补齐格式：2026-1-5 或 2026-1-5 9:30
+    m = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2}))?$", time_str)
+    if m:
+        y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        try:
+            if m.group(4):
+                return datetime(y, mo, d, int(m.group(4)), int(m.group(5)))
+            return datetime(y, mo, d)
+        except ValueError:
+            pass
+    return None
 
 
 def get_forum_thread_list(page):
@@ -171,13 +181,26 @@ def get_forum_thread_list(page):
         last_reply_time = None
         td_by_list = tbody.select("td.by")
         if len(td_by_list) >= 2:
-            time_span = td_by_list[-1].select_one("span[title]")
+            td_last = td_by_list[-1]
+            # Recent threads: relative display + absolute time in span[title]
+            time_span = td_last.select_one("span[title]")
             if time_span:
                 last_reply_time = parse_time(time_span.get("title", ""))
+            # Older threads: absolute date shown as text inside em tag
+            if last_reply_time is None:
+                em = td_last.select_one("em")
+                if em:
+                    for node in em.children:
+                        txt = node.get_text(strip=True) if hasattr(node, "get_text") else str(node).strip()
+                        last_reply_time = parse_time(txt)
+                        if last_reply_time:
+                            break
+        # Fallback: last span with a parseable title
         if last_reply_time is None:
-            spans = tbody.find_all("span", title=True)
-            if spans:
-                last_reply_time = parse_time(spans[-1].get("title", ""))
+            for span in reversed(tbody.find_all("span", title=True)):
+                last_reply_time = parse_time(span.get("title", ""))
+                if last_reply_time:
+                    break
         threads.append({
             "tid": tid,
             "url": f"{BASE_URL}/thread-{tid}-1-1.html",
@@ -461,8 +484,8 @@ def run_incremental(cp, done_tids, results):
 
         parsed_times = [t["last_reply_time"] for t in threads if t.get("last_reply_time")]
         if new_in_page:
-            newest = max(t["last_reply_time"] for t in new_in_page).strftime("%Y-%m-%d")
-            oldest_new = min(t["last_reply_time"] for t in new_in_page).strftime("%Y-%m-%d")
+            newest = max(t["last_reply_time"] for t in new_in_page).strftime("%Y-%m-%d %H:%M")
+            oldest_new = min(t["last_reply_time"] for t in new_in_page).strftime("%Y-%m-%d %H:%M")
             time_hint = f"{oldest_new} ~ {newest}" if oldest_new != newest else newest
         elif parsed_times:
             time_hint = f"最新: {max(parsed_times).strftime('%Y-%m-%d')}"
@@ -504,7 +527,7 @@ def run_incremental(cp, done_tids, results):
     total_checked = 0
     for i, t in enumerate(to_scrape, 1):
         tid = t["tid"]
-        lrt_str = t["last_reply_time"].strftime("%Y-%m-%d") if t.get("last_reply_time") else "?"
+        lrt_str = t["last_reply_time"].strftime("%Y-%m-%d %H:%M") if t.get("last_reply_time") else "?"
         print(f"[{i}/{len(to_scrape)}] tid={tid}  最后回复: {lrt_str}  《{t['title'][:35]}》")
         total_checked += 1
         result = get_thread_conversation(tid, t["url"], t["title"])
