@@ -183,7 +183,8 @@ def parse_expert_qa_md(filepath):
     return []
 
 # ========== 主导入函数 ==========
-def import_all():
+def init_index():
+    """全量模式：删除并重建索引及全部设置"""
     try:
         meili.delete_index("expert_qa")
     except:
@@ -205,12 +206,7 @@ def import_all():
         "expert_last_date", "expert_last_sort", "conversation", "file"
     ])
     meili.index("expert_qa").update_ranking_rules([
-        "sort",
-        "words",
-        "typo",
-        "proximity",
-        "attribute",
-        "exactness",
+        "sort", "words", "typo", "proximity", "attribute", "exactness",
     ])
 
     import requests
@@ -221,9 +217,10 @@ def import_all():
         json={"maxTotalHits": 100000},
         headers={"Authorization": f"Bearer {meili_key}"}
     )
-
     print("索引初始化完成")
 
+
+def load_records():
     all_records = []
     if IMPORT_DIR.exists():
         for f in sorted(IMPORT_DIR.glob("*")):
@@ -232,20 +229,32 @@ def import_all():
                 print(f"  [专家] {f.name}: {len(records)} 条")
                 all_records.extend(records)
             elif f.suffix == ".md":
-                # 如果是 .md 文件，尝试按实务案例解析
                 records = parse_case_study_md(f)
                 if records:
                     print(f"  [案例] {f.name}: {len(records)} 条")
                     all_records.extend(records)
                 else:
-                    # 如果解析不出，可能是其他格式，跳过
                     print(f"  [跳过] {f.name}: 未识别为实务案例格式")
+    return all_records
 
+
+def upsert_records(all_records):
     batch_size = 200
     for i in range(0, len(all_records), batch_size):
         meili.index("expert_qa").add_documents(all_records[i:i + batch_size])
-
     print(f"\n总计导入 {len(all_records)} 条记录")
 
+
+def import_all(incremental=False):
+    if incremental:
+        print("【增量模式】直接 upsert，索引全程可用")
+    else:
+        init_index()
+
+    all_records = load_records()
+    upsert_records(all_records)
+
+
 if __name__ == "__main__":
-    import_all()
+    import sys
+    import_all(incremental="--incremental" in sys.argv)
