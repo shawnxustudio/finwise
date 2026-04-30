@@ -265,28 +265,21 @@ body::before {
 .comment-post .post-content { font-size:0.82rem; }
 .modal-footer { padding:12px 20px; border-top:1px solid var(--glass-border); background:var(--glass); display:flex; align-items:center; justify-content:space-between; }
 .modal-footer-info { font-family:'DM Mono',monospace; font-size:0.60rem; color:var(--text-dim); }
-/* 移动端适配：导航胶囊紧凑化 */
 @media (max-width: 500px) {
   .nav-float {
-    padding: 3px;
-    max-width: calc(100% - 24px);
+    padding: 4px;
+    width: calc(100% - 32px);
     border-radius: 18px;
   }
-  .nav-logo {
-    display: none;  /* 隐藏 Logo 文字，为标签腾出空间 */
-  }
+  .nav-logo { display: none; }
   .nav-tab {
-    font-size: 0.7rem;
-    height: 32px;
-    padding: 0 6px;
-    gap: 3px;
+    flex: 1;
+    font-size: 0.78rem;
+    height: 34px;
+    padding: 0 8px;
+    gap: 4px;
   }
-  .nav-tab svg {
-    width: 11px;
-    height: 11px;
-  }
-  /* 若仍拥挤，可进一步隐藏图标，只留文字 */
-  /* .nav-tab svg { display: none; } */
+  .nav-tab svg { width: 12px; height: 12px; }
 }
 </style>
 </head>
