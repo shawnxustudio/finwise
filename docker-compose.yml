@@ -6,7 +6,7 @@ services:
     container_name: finwise-meilisearch
     restart: unless-stopped
     ports:
-      - "8800:8800"
+      - "8800:7700"
     volumes:
       - ./meilisearch_data:/meili_data
     environment:
