@@ -435,61 +435,92 @@ def run_incremental(cp, done_tids, results):
         return 0
 
     last_time = parse_time(last_time_str)
-    print(f"【增量模式】上次爬取时间: {last_time_str}，只处理此后有新回复的帖子\n")
+    print(f"【增量模式】上次爬取时间: {last_time_str}\n")
 
+    # ── 第一阶段：扫描列表页，统计待抓取帖子 ──
+    print("─" * 50)
+    print("第一阶段：扫描列表页")
+    print("─" * 50)
+
+    to_scrape = []
     page = 1
-    total_checked = 0
     old_pages_count = 0
 
     while True:
-        print(f"[列表页 {page}]")
         threads, has_next = get_forum_thread_list(page)
         if not threads:
+            print(f"[第 {page} 页] 空页，停止扫描")
             break
 
-        new_threads = []
-        all_old = True
+        new_in_page = []
         for t in threads:
             lrt = t.get("last_reply_time")
-            # lrt is None means unparseable time → treat as old to avoid stale scraping
             if lrt is None or (last_time and lrt <= last_time):
                 continue
-            all_old = False
-            new_threads.append(t)
+            new_in_page.append(t)
 
-        print(f"  找到 {len(new_threads)} 个新/更新帖子（共{len(threads)}个）")
+        parsed_times = [t["last_reply_time"] for t in threads if t.get("last_reply_time")]
+        if new_in_page:
+            newest = max(t["last_reply_time"] for t in new_in_page).strftime("%Y-%m-%d")
+            oldest_new = min(t["last_reply_time"] for t in new_in_page).strftime("%Y-%m-%d")
+            time_hint = f"{oldest_new} ~ {newest}" if oldest_new != newest else newest
+        elif parsed_times:
+            time_hint = f"最新: {max(parsed_times).strftime('%Y-%m-%d')}"
+        else:
+            time_hint = "时间未知"
 
-        for t in new_threads:
-            tid = t["tid"]
-            total_checked += 1
-            result = get_thread_conversation(tid, t["url"], t["title"])
-            if result:
-                existing = next((i for i, r in enumerate(results) if r["tid"] == tid), None)
-                if existing is not None:
-                    results[existing] = result
-                    print(f"  ↻ tid={tid} 《{t['title'][:35]}》 -> 已更新")
-                else:
-                    results.append(result)
-                    done_tids.add(tid)
-                    print(f"  ✓ tid={tid} 《{t['title'][:35]}》 -> 新增")
-            else:
-                print(f"  - tid={tid} 《{t['title'][:35]}》 -> 无陈版主参与")
+        print(f"[第 {page:3d} 页]  新/更新: {len(new_in_page):3d} / {len(threads)}  ({time_hint})", end="")
 
-            save_json(OUTPUT_JSON, results)
-            sleep()
+        to_scrape.extend(new_in_page)
 
-        if all_old:
+        if not new_in_page:
             old_pages_count += 1
-            print(f"  [连续第 {old_pages_count}/{INC_STOP_PAGES} 页全为旧帖]")
+            print(f"  ← 旧帖 {old_pages_count}/{INC_STOP_PAGES}")
             if old_pages_count >= INC_STOP_PAGES:
-                print("连续多页均为旧帖，增量完成！")
+                print(f"\n连续 {INC_STOP_PAGES} 页全为旧帖，停止扫描")
                 break
         else:
             old_pages_count = 0
+            print()
 
         if not has_next:
             break
         page += 1
+        sleep()
+
+    print()
+    print("─" * 50)
+    print(f"扫描完成：共找到 {len(to_scrape)} 个需要更新的帖子")
+    print("─" * 50)
+
+    if not to_scrape:
+        cp["last_incremental_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        save_json(CHECKPOINT_FILE, cp)
+        return 0
+
+    # ── 第二阶段：逐帖抓取 ──
+    print("\n第二阶段：逐帖抓取内容\n")
+
+    total_checked = 0
+    for i, t in enumerate(to_scrape, 1):
+        tid = t["tid"]
+        lrt_str = t["last_reply_time"].strftime("%Y-%m-%d") if t.get("last_reply_time") else "?"
+        print(f"[{i}/{len(to_scrape)}] tid={tid}  最后回复: {lrt_str}  《{t['title'][:35]}》")
+        total_checked += 1
+        result = get_thread_conversation(tid, t["url"], t["title"])
+        if result:
+            existing = next((idx for idx, r in enumerate(results) if r["tid"] == tid), None)
+            if existing is not None:
+                results[existing] = result
+                print(f"  ↻ 已更新（{len(result['conversation'])} 条）")
+            else:
+                results.append(result)
+                done_tids.add(tid)
+                print(f"  ✓ 新增（{len(result['conversation'])} 条）")
+        else:
+            print(f"  - 无陈版主参与")
+
+        save_json(OUTPUT_JSON, results)
         sleep()
 
     cp["last_incremental_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
