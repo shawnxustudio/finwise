@@ -60,7 +60,7 @@ body::before {
 .nav-float {
     position: fixed; top: 16px; left: 0; right: 0; margin: 0 auto; z-index: 200;
     display: flex; align-items: center; gap: 3px; padding: 5px;
-    max-width: 600px; width: calc(100% - 32px);
+    width: max-content; max-width: calc(100% - 32px);
     animation: lg-enter 0.65s cubic-bezier(0.22,1,0.36,1) both;
     background: radial-gradient(ellipse 80% 60% at 22% 18%, rgba(255,255,255,0.30) 0%, transparent 58%),
         linear-gradient(158deg, rgba(255,255,255,0.40) 0%, rgba(245,243,255,0.18) 35%, rgba(210,205,250,0.16) 65%, rgba(255,255,255,0.26) 100%);
@@ -98,10 +98,10 @@ body::before {
 
 .nav-logo { font-family:'DM Mono',monospace; font-size:0.78rem; font-weight:500; color:var(--accent); letter-spacing:0.06em; padding:0 14px; white-space:nowrap; position:relative; z-index:4; flex-shrink:0; }
 .nav-tab {
-    flex:1; height:36px; border:none; cursor:pointer;
+    flex:none; height:36px; border:none; cursor:pointer;
     display:flex; align-items:center; justify-content:center; gap:5px; border-radius:15px;
     font-family:'Noto Serif SC',serif; font-size:0.80rem; font-weight:600;
-    color:rgba(38,34,65,0.52); background:transparent; white-space:nowrap; padding:0 8px;
+    color:rgba(38,34,65,0.52); background:transparent; white-space:nowrap; padding:0 20px;
     position:relative; z-index:4;
     transition:color 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.55,1);
 }
