@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FinWise · 财务知识库</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-base: #f0eff5;
+    --glass:         rgba(255,255,255,0.62);
+    --glass-hover:   rgba(255,255,255,0.80);
+    --glass-active:  rgba(255,255,255,0.92);
+    --glass-border:  rgba(180,174,210,0.28);
+    --glass-border2: rgba(150,140,200,0.42);
+    --text:       #1c1a2e;
+    --text-muted: #6b6585;
+    --text-dim:   #a8a4be;
+    --accent:        #4a4acb;
+    --accent-light:  #ededff;
+    --accent-dim:    rgba(91,91,214,0.10);
+    --accent-border: rgba(91,91,214,0.35);
+    --success:        #1a9e6e;
+    --success-light:  #edfaf4;
+    --success-border: rgba(26,158,110,0.28);
+    --warning:        #c07c10;
+    --warning-light:  #fef9ec;
+    --info:           #2b6cb0;
+    --info-light:     #ebf4ff;
+    --info-border:    rgba(43,108,176,0.24);
+    --radius-sm: 9px; --radius: 15px; --radius-lg: 20px; --radius-xl: 26px;
+    --shadow-sm: 0 1px 4px rgba(80,70,160,0.06), 0 2px 12px rgba(80,70,160,0.05);
+    --shadow:    0 4px 16px rgba(80,70,160,0.09), 0 1px 4px rgba(80,70,160,0.05);
+    --shadow-lg: 0 12px 40px rgba(80,70,160,0.14), 0 2px 8px rgba(80,70,160,0.07);
+    --blur: blur(12px) saturate(145%); --blur-md: blur(18px) saturate(155%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+    background-color: var(--bg-base);
+    background-image:
+        radial-gradient(ellipse 65% 50% at 5% 0%, rgba(150,140,240,0.11) 0%, transparent 65%),
+        radial-gradient(ellipse 48% 38% at 96% 5%, rgba(255,175,195,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 42% 32% at 2% 95%, rgba(130,215,195,0.07) 0%, transparent 60%);
+    color: var(--text);
+    font-family: 'Noto Serif SC', 'PingFang SC', 'Microsoft YaHei', serif;
+    min-height: 100vh;
+}
+body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+}
+.app-root { position: relative; z-index: 1; min-height: 100vh; }
+
+/* ══ 导航 ══ */
+@keyframes shine-sweep { 0%{transform:translateX(-140%) skewX(-18deg);opacity:0}12%{opacity:1}100%{transform:translateX(240%) skewX(-18deg);opacity:0} }
+@keyframes lg-enter { from{opacity:0;transform:translateY(-20px) scale(0.94)}to{opacity:1;transform:translateY(0) scale(1)} }
+
+.nav-float {
+    position: fixed; top: 16px; left: 0; right: 0; margin: 0 auto; z-index: 200;
+    display: flex; align-items: center; gap: 3px; padding: 5px;
+    max-width: 600px; width: calc(100% - 32px);
+    animation: lg-enter 0.65s cubic-bezier(0.22,1,0.36,1) both;
+    background: radial-gradient(ellipse 80% 60% at 22% 18%, rgba(255,255,255,0.30) 0%, transparent 58%),
+        linear-gradient(158deg, rgba(255,255,255,0.40) 0%, rgba(245,243,255,0.18) 35%, rgba(210,205,250,0.16) 65%, rgba(255,255,255,0.26) 100%);
+    backdrop-filter: blur(18px) saturate(165%) brightness(1.04);
+    -webkit-backdrop-filter: blur(18px) saturate(165%) brightness(1.04);
+    border-radius: 22px; border: 1px solid transparent;
+    outline: 1px solid rgba(255,255,255,0.48); outline-offset: -1px;
+    box-shadow: 0 12px 40px rgba(80,70,160,0.13), 0 4px 12px rgba(80,70,160,0.07),
+        inset 0 0.5px 0 rgba(255,255,255,0.95), inset 0.5px 0 0 rgba(255,255,255,0.58),
+        inset 0 -0.5px 0 rgba(160,150,220,0.20);
+    overflow: hidden; isolation: isolate; user-select: none;
+    transition: transform 0.42s cubic-bezier(0.34,1.25,0.55,1), box-shadow 0.35s ease;
+}
+.nav-float::before {
+    content: ''; position: absolute; inset: 0; border-radius: 22px;
+    background: linear-gradient(155deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.15) 28%, transparent 50%, rgba(200,195,255,0.07) 78%, rgba(180,170,240,0.10) 100%);
+    pointer-events: none; z-index: 1;
+}
+.nav-float:hover { transform: translateY(-2px); box-shadow: 0 16px 48px rgba(80,70,160,0.17), 0 6px 18px rgba(80,70,160,0.09), inset 0 0.5px 0 rgba(255,255,255,1); }
+
+.lg-indicator {
+    position: absolute; top: 5px; height: calc(100% - 10px); border-radius: 15px;
+    pointer-events: none; z-index: 2;
+    background: linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(240,237,255,0.74) 50%, rgba(255,255,255,0.84) 100%);
+    box-shadow: 0 2px 12px rgba(80,70,160,0.11), inset 0 0.5px 0 rgba(255,255,255,1), inset 0 -0.5px 0 rgba(160,150,220,0.22);
+    border: 1px solid rgba(255,255,255,0.82); opacity: 0; will-change: left, width;
+}
+.lg-shine { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; pointer-events: none; z-index: 3; }
+.lg-shine::after {
+    content: ''; position: absolute; top: -20%; left: 0; width: 26%; height: 140%;
+    background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0.26) 50%, rgba(255,255,255,0) 70%, transparent 100%);
+    transform: translateX(-120%) skewX(-18deg); opacity: 0;
+}
+.lg-shine.run::after { animation: shine-sweep 0.52s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+.nav-logo { font-family:'DM Mono',monospace; font-size:0.78rem; font-weight:500; color:var(--accent); letter-spacing:0.06em; padding:0 14px; white-space:nowrap; position:relative; z-index:4; flex-shrink:0; }
+.nav-tab {
+    flex:1; height:36px; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:5px; border-radius:15px;
+    font-family:'Noto Serif SC',serif; font-size:0.80rem; font-weight:600;
+    color:rgba(38,34,65,0.52); background:transparent; white-space:nowrap; padding:0 8px;
+    position:relative; z-index:4;
+    transition:color 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.55,1);
+}
+.nav-tab:hover { color:rgba(28,24,52,0.80); }
+.nav-tab.active { color:rgba(22,20,45,0.90); font-weight:700; }
+.nav-tab:active { transform:scale(0.92); transition:transform 0.09s ease; }
+.nav-tab svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+
+/* ══ 页面容器 ══ */
+.page { display:none; padding:80px 16px 80px; max-width:900px; margin:0 auto; }
+.page.active { display:block; }
+
+/* ══ Hero ══ */
+@keyframes hero-rise { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+.hero { padding:40px 24px 48px; max-width:760px; margin:0 auto; text-align:center; animation:hero-rise 0.9s 0.2s cubic-bezier(0.22,1,0.36,1) both; }
+.hero-eyebrow { display:inline-flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); font-weight:600; margin-bottom:14px; }
+.hero-eyebrow::before,.hero-eyebrow::after { content:''; display:block; width:20px; height:2px; background:var(--accent); border-radius:2px; }
+.hero-title { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; line-height:1.2; color:var(--text); letter-spacing:-0.02em; margin-bottom:12px; }
+.hero-sub { font-size:0.88rem; color:var(--text-muted); line-height:1.7; }
+.hero-stats { display:flex; justify-content:center; gap:32px; margin-top:28px; }
+.hero-stat { text-align:center; }
+.hero-stat-num { font-family:'DM Mono',monospace; font-size:1.5rem; font-weight:500; color:var(--accent); line-height:1; }
+.hero-stat-label { font-size:0.68rem; color:var(--text-dim); margin-top:4px; letter-spacing:0.05em; }
+
+/* ══ 搜索栏 ══ */
+.search-bar {
+    display:flex; gap:8px; margin-bottom:16px;
+    background:linear-gradient(150deg, rgba(255,255,255,0.88) 0%, rgba(242,240,255,0.72) 100%);
+    backdrop-filter:var(--blur-md); -webkit-backdrop-filter:var(--blur-md);
+    border:1px solid rgba(255,255,255,0.72);
+    outline:1px solid rgba(180,174,210,0.22); outline-offset:-1px;
+    border-radius:var(--radius-lg); padding:8px 8px 8px 16px; box-shadow:var(--shadow);
+}
+.search-bar input { flex:1; border:none; background:transparent; font-family:'Noto Serif SC',serif; font-size:0.92rem; color:var(--text); outline:none; }
+.search-bar input::placeholder { color:var(--text-dim); }
+.search-bar button {
+    padding:9px 20px; border:none; border-radius:12px; cursor:pointer;
+    font-family:'Noto Serif SC',serif; font-size:0.82rem; font-weight:600;
+    background:var(--accent); color:white;
+    box-shadow:0 4px 16px rgba(74,74,203,0.30);
+    transition:transform 0.28s cubic-bezier(0.34,1.2,0.55,1), box-shadow 0.22s ease;
+}
+.search-bar button:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(74,74,203,0.40); }
+.search-bar button:active { transform:scale(0.95); }
+
+/* ══ 结果信息栏 ══ */
+.results-bar {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px; padding:0 2px;
+}
+.results-info { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--text-dim); letter-spacing:0.05em; }
+
+/* ══ 结果列表 ══ */
+@keyframes card-enter { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+.result-list { display:flex; flex-direction:column; gap:5px; }
+.result-row {
+    background:var(--glass); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+    border:1px solid var(--glass-border); border-radius:var(--radius);
+    padding:11px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    cursor:pointer; box-shadow:var(--shadow-sm);
+    animation:card-enter 0.25s cubic-bezier(0.22,1,0.36,1) both;
+    transition:background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.result-row:hover { background:var(--glass-hover); box-shadow:var(--shadow); transform:translateX(3px); }
+.result-row-title { font-size:0.86rem; font-weight:600; color:var(--text); line-height:1.4; flex:1; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.result-row-title mark { background:var(--accent-light); color:var(--accent); border-radius:3px; padding:0 2px; }
+.result-row-meta { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.tag { font-family:'DM Mono',monospace; font-size:0.58rem; padding:3px 8px; border-radius:20px; font-weight:500; letter-spacing:0.04em; }
+.tag-expert { background:var(--accent-dim); color:var(--accent); border:1px solid var(--accent-border); }
+.tag-date { background:var(--glass-active); color:var(--text-muted); border:1px solid var(--glass-border2); }
+.result-row-arrow { width:16px; height:16px; flex-shrink:0; opacity:0.3; fill:none; stroke:var(--text); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:opacity 0.15s, transform 0.15s; }
+.result-row:hover .result-row-arrow { opacity:0.7; transform:translateX(2px); }
+
+/* ══ 分页 ══ */
+.pagination {
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    margin-top:20px; padding-bottom:8px;
+}
+.page-btn {
+    min-width:34px; height:34px; padding:0 10px; border:none; border-radius:10px; cursor:pointer;
+    font-family:'DM Mono',monospace; font-size:0.75rem; font-weight:500;
+    background:var(--glass); color:var(--text-muted);
+    border:1px solid var(--glass-border2);
+    transition:all 0.18s ease;
+    display:flex; align-items:center; justify-content:center;
+}
+.page-btn:hover { background:var(--glass-hover); color:var(--text); }
+.page-btn.active { background:var(--accent); color:white; border-color:var(--accent); box-shadow:0 3px 12px rgba(74,74,203,0.28); }
+.page-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.page-btn svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ══ 空/加载 ══ */
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-dim); font-size:0.85rem; line-height:1.8; }
+.empty-state-icon { font-size:2.4rem; margin-bottom:12px; opacity:0.5; }
+.loading-dots { display:flex; justify-content:center; gap:6px; padding:40px; }
+.loading-dot { width:7px; height:7px; border-radius:50%; background:var(--accent-border); animation:dot-pulse 1.2s ease-in-out infinite; }
+.loading-dot:nth-child(2) { animation-delay:0.2s; }
+.loading-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes dot-pulse { 0%,80%,100%{transform:scale(0.7);opacity:0.4}40%{transform:scale(1);opacity:1} }
+
+/* ══ 建议词 ══ */
+.suggest-label { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--text-dim); letter-spacing:0.08em; margin-bottom:10px; padding-left:2px; }
+.suggest-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:20px; }
+.suggest-chip { font-size:0.75rem; padding:6px 14px; border-radius:20px; cursor:pointer; border:1px solid var(--glass-border2); background:var(--glass); color:var(--text-muted); font-family:'Noto Serif SC',serif; transition:all 0.22s ease; box-shadow:var(--shadow-sm); }
+.suggest-chip:hover { background:var(--glass-hover); color:var(--text); transform:translateY(-1px); box-shadow:var(--shadow); }
+
+
+/* ══ 论坛弹窗 ══ */
+.modal-overlay {
+    position:fixed; inset:0; z-index:500;
+    background:rgba(20,18,40,0.55); backdrop-filter:blur(6px);
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:20px 16px; overflow-y:auto;
+    opacity:0; pointer-events:none; transition:opacity 0.22s ease;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal {
+    background:var(--bg-base); border-radius:var(--radius-xl);
+    box-shadow:0 24px 80px rgba(20,18,40,0.28);
+    width:100%; max-width:720px; min-height:200px; flex-shrink:0;
+    transform:translateY(20px) scale(0.97);
+    transition:transform 0.28s cubic-bezier(0.22,1,0.36,1); overflow:hidden;
+}
+.modal-overlay.open .modal { transform:translateY(0) scale(1); }
+.modal-header {
+    padding:18px 20px 14px; border-bottom:1px solid var(--glass-border);
+    background:var(--glass); backdrop-filter:var(--blur);
+    display:flex; align-items:flex-start; gap:12px;
+    position:sticky; top:0; z-index:10;
+}
+.modal-title { font-size:0.95rem; font-weight:700; color:var(--text); flex:1; line-height:1.4; }
+.modal-meta { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; align-items:center; }
+.modal-meta a { font-family:'DM Mono',monospace; font-size:0.60rem; color:var(--accent); text-decoration:none; }
+.modal-meta a:hover { text-decoration:underline; }
+.modal-close { width:28px; height:28px; border-radius:50%; border:none; cursor:pointer; background:var(--glass-border); color:var(--text-muted); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s; font-size:14px; line-height:1; }
+.modal-close:hover { background:var(--glass-border2); }
+.modal-body { padding:0; }
+
+/* 论坛帖子样式 */
+.forum-post { display:flex; gap:0; border-bottom:1px solid var(--glass-border); transition:background 0.15s; }
+.forum-post:last-child { border-bottom:none; }
+.forum-post.expert-post { background:rgba(237,237,255,0.25); }
+.forum-post.questioner-post { background:rgba(255,255,255,0.4); }
+.forum-post.other-post { background:rgba(255,255,255,0.15); }
+.comment-post {
+    margin-left: 24px;
+    border-left: 2px solid var(--accent-border);
+    background: rgba(74,74,203,0.04);
+}
+.post-main { flex:1; padding:14px 16px; min-width:0; }
+.post-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.post-author { font-size:0.78rem; font-weight:600; color:var(--text); }
+.post-author.is-expert { color:var(--accent); }
+.post-role-badge { font-family:'DM Mono',monospace; font-size:0.52rem; padding:2px 6px; border-radius:10px; font-weight:500; }
+.badge-expert { background:var(--accent-dim); color:var(--accent); border:1px solid var(--accent-border); }
+.badge-questioner { background:var(--success-light); color:var(--success); border:1px solid var(--success-border); }
+.badge-other { background:var(--glass-active); color:var(--text-muted); border:1px solid var(--glass-border2); }
+.post-time { font-family:'DM Mono',monospace; font-size:0.58rem; color:var(--text-dim); margin-left:auto; }
+.post-content { font-size:0.85rem; color:var(--text); line-height:1.8; white-space:pre-wrap; word-break:break-word; }
+.comment-post .post-main { padding:10px 14px; }
+.comment-post .post-content { font-size:0.82rem; }
+.modal-footer { padding:12px 20px; border-top:1px solid var(--glass-border); background:var(--glass); display:flex; align-items:center; justify-content:space-between; }
+.modal-footer-info { font-family:'DM Mono',monospace; font-size:0.60rem; color:var(--text-dim); }
+/* 移动端适配：导航胶囊紧凑化 */
+@media (max-width: 500px) {
+  .nav-float {
+    padding: 3px;
+    max-width: calc(100% - 24px);
+    border-radius: 18px;
+  }
+  .nav-logo {
+    display: none;  /* 隐藏 Logo 文字，为标签腾出空间 */
+  }
+  .nav-tab {
+    font-size: 0.7rem;
+    height: 32px;
+    padding: 0 6px;
+    gap: 3px;
+  }
+  .nav-tab svg {
+    width: 11px;
+    height: 11px;
+  }
+  /* 若仍拥挤，可进一步隐藏图标，只留文字 */
+  /* .nav-tab svg { display: none; } */
+}
+</style>
+</head>
+<body>
+<div class="app-root">
+
+  <nav class="nav-float" id="navFloat">
+    <div class="lg-indicator" id="lgIndicator"></div>
+    <div class="lg-shine" id="lgShine"></div>
+    <span class="nav-logo">FinWise</span>
+    <button class="nav-tab active" data-tab="home" onclick="switchTab('home',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>首页
+    </button>
+    <button class="nav-tab" data-tab="expert" onclick="switchTab('expert',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>专家问答
+    </button>
+  </nav>
+
+  <!-- 首页 -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-eyebrow">Financial Knowledge Base</div>
+      <h1 class="hero-title">财务知识库</h1>
+      <p class="hero-sub">汇聚陈版主多年专业答疑整理</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num" id="statExpert">—</div><div class="hero-stat-label">专家问答</div></div>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 专家问答页 -->
+  <div id="page-expert" class="page">
+    <div class="search-bar">
+      <input type="text" id="expertInput" placeholder="搜索关键词，留空显示全部…" onkeydown="if(event.key==='Enter')doSearch()" oninput="toggleClearBtn()">
+      <button id="clearBtn" onclick="clearSearch()" style="display:none;padding:9px 14px;border:none;border-radius:12px;cursor:pointer;font-size:0.82rem;font-weight:600;background:var(--glass-active);color:var(--text-muted);border:1px solid var(--glass-border2);transition:all 0.18s;white-space:nowrap;">✕ 清除</button>
+      <button onclick="doSearch()">搜索</button>
+    </div>
+    <div id="expertResults">
+      <div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 论坛弹窗 -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div style="flex:1;min-width:0;">
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <span class="modal-footer-info" id="modalFooterInfo"></span>
+      <span class="modal-footer-info">FinWise · 财务知识库</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+const PAGE_SIZE = 20;
+
+// 专家问答状态
+let state = {
+  query: '',
+  page: 0,
+  total: 0,
+  totalPages: 0,
+  hits: [],
+};
+
+/* ══ 导航 ══ */
+function switchTab(tab, btn) {
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-' + tab).classList.add('active');
+  animateIndicator(btn);
+  const shine = document.getElementById('lgShine');
+  shine.classList.remove('run'); void shine.offsetWidth; shine.classList.add('run');
+  if (tab === 'expert') {
+    state.page = 0;
+    loadExpert(0);
+  }
+}
+function animateIndicator(btn) {
+  const ind = document.getElementById('lgIndicator');
+  const nav = document.getElementById('navFloat');
+  const navRect = nav.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+  ind.style.transition = 'none'; ind.style.opacity = '0';
+  ind.style.left = (btnRect.left - navRect.left) + 'px';
+  ind.style.width = btnRect.width + 'px';
+  requestAnimationFrame(() => {
+    ind.style.transition = 'left 0.38s cubic-bezier(0.34,1.2,0.55,1), width 0.38s cubic-bezier(0.34,1.2,0.55,1), opacity 0.22s ease';
+    ind.style.opacity = '1';
+  });
+}
+window.addEventListener('load', () => {
+  const activeBtn = document.querySelector('.nav-tab.active');
+  if (activeBtn) animateIndicator(activeBtn);
+  
+  // 获取专家问答总数并更新首页显示
+  fetchExpertCount();
+});
+
+async function fetchExpertCount() {
+  try {
+    const res = await fetch(`${API}/api/expert_qa/search?hitsPerPage=1&page=1`);
+    const data = await res.json();
+    const total = data.totalHits || data.estimatedTotalHits || 0;
+    document.getElementById('statExpert').textContent = total.toLocaleString();
+  } catch (e) {
+    // 静默失败，保持原有显示
+  }
+}
+
+function quickSearch(q) {
+  const btn = document.querySelector('.nav-tab[data-tab="expert"]');
+  switchTab('expert', btn);
+  document.getElementById('expertInput').value = q;
+  doSearch();
+}
+
+function doSearch() {
+  const q = document.getElementById('expertInput').value.trim();
+  state.query = q;
+  state.page = 0;
+  loadExpert(0);
+}
+
+async function loadExpert(page) {
+  state.page = page;
+  const el = document.getElementById('expertResults');
+  el.innerHTML = '<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+
+  try {
+    const q = state.query;
+    const params = new URLSearchParams({
+      hitsPerPage: PAGE_SIZE,
+      page: page + 1,
+    });
+    if (q) params.set('q', q);
+
+    const res = await fetch(`${API}/api/expert_qa/search?${params}`);
+    const data = await res.json();
+
+    state.hits = data.hits || [];
+    state.total = data.totalHits || data.estimatedTotalHits || state.hits.length;
+    state.totalPages = data.totalPages || Math.ceil(state.total / PAGE_SIZE);
+
+    renderExpertPage(el, q);
+
+    if (!q && page === 0) {
+      document.getElementById('statExpert').textContent = state.total.toLocaleString();
+    }
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div>加载失败，请检查服务是否正常</div>';
+  }
+}
+
+function renderExpertPage(el, q) {
+  const hits = state.hits;
+  const total = state.total;
+  const page = state.page;
+  const totalPages = state.totalPages || Math.ceil(total / PAGE_SIZE);
+
+  if (!hits.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div>未找到相关结果</div>';
+    return;
+  }
+
+  const infoText = q ? `找到约 ${total.toLocaleString()} 条结果 · "${q}"` : `共 ${total.toLocaleString()} 条`;
+
+  let html = `
+  <div class="results-bar">
+    <span class="results-info">${infoText}</span>
+  </div>
+  <div class="result-list">`;
+
+  hits.forEach((h, i) => {
+    const hl = h._formatted || h;
+    const title = (hl.title || h.title || '（无标题）').replace(/❓|💬/g, '').trim();
+    const date = h.expert_last_date || '';
+    const source = h.source || h.file || '';
+    const sourceType = h.source_type || 'expert';
+
+    let sourceTag = '';
+    if (sourceType === 'case') {
+      sourceTag = `<span class="tag" style="background:var(--info-light);color:var(--info);border:1px solid var(--info-border);">📘 ${source}</span>`;
+    } else {
+      sourceTag = source ? `<span class="tag tag-expert">${source}</span>` : '';
+    }
+
+    html += `
+    <div class="result-row" style="animation-delay:${i*0.03}s" onclick="openModal(${i})">
+      <div class="result-row-title">${title}</div>
+      <div class="result-row-meta">
+        ${date ? `<span class="tag tag-date">${date}</span>` : ''}
+        ${sourceTag}
+      </div>
+      <svg class="result-row-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+  });
+
+  html += '</div>';
+  html += renderPagination(page, totalPages);
+  el.innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPagination(current, total) {
+  if (total <= 1) return '';
+  let html = '<div class="pagination">';
+  html += `<button class="page-btn" onclick="loadExpert(${current-1})" ${current===0?'disabled':''}><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+  const pages = getPageNumbers(current, total);
+  pages.forEach(p => {
+    if (p === '...') html += `<span class="page-btn" style="cursor:default;opacity:0.4">…</span>`;
+    else html += `<button class="page-btn ${p===current?'active':''}" onclick="loadExpert(${p})">${p+1}</button>`;
+  });
+  html += `<button class="page-btn" onclick="loadExpert(${current+1})" ${current===total-1?'disabled':''}><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+  html += `
+  <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+    <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text-dim);">跳转</span>
+    <input type="number" min="1" max="${total}" value="${current+1}" id="pageJumpInput" style="width:52px;height:34px;border:1px solid var(--glass-border2);border-radius:10px;background:var(--glass);text-align:center;font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--text);outline:none;padding:0 6px;" onkeydown="if(event.key==='Enter'){const v=parseInt(this.value);if(v>=1&&v<=${total})loadExpert(v-1);}"/>
+    <button class="page-btn" onclick="const v=parseInt(document.getElementById('pageJumpInput').value);if(v>=1&&v<=${total})loadExpert(v-1);">Go</button>
+  </div>`;
+  html += '</div>';
+  return html;
+}
+
+function getPageNumbers(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i);
+  const pages = [];
+  if (current <= 3) {
+    for (let i = 0; i < 5; i++) pages.push(i);
+    pages.push('...'); pages.push(total - 1);
+  } else if (current >= total - 4) {
+    pages.push(0); pages.push('...');
+    for (let i = total - 5; i < total; i++) pages.push(i);
+  } else {
+    pages.push(0); pages.push('...');
+    for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+    pages.push('...'); pages.push(total - 1);
+  }
+  return pages;
+}
+
+function highlightKeywords(text, keywords) {
+  if (!keywords || !keywords.length) return escapeHtml(text);
+  let result = escapeHtml(text);
+  keywords.forEach(kw => {
+    if (!kw) return;
+    const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(escaped, 'g');
+    result = result.replace(re, `<span style="color:#e53e3e;font-weight:600">${kw}</span>`);
+  });
+  return result;
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function renderForumPost(item, keywords) {
+  const role = item.role || 'other';
+  const type = item.type || 'post';
+  const isExpert = role === 'expert';
+  const isQuestioner = role === 'questioner';
+  const isComment = type === 'comment';
+  const postClass = isComment ? 'comment-post' : isExpert ? 'expert-post' : isQuestioner ? 'questioner-post' : 'other-post';
+  const author = item.author || '匿名';
+  const badgeClass = isExpert ? 'badge-expert' : isQuestioner ? 'badge-questioner' : 'badge-other';
+  const badgeText = isExpert ? '版主' : isQuestioner ? '楼主' : '回帖';
+  const rawContent = (item.content || '').trim();
+  const content = highlightKeywords(rawContent, keywords || []);
+  return `
+  <div class="forum-post ${postClass}">
+    <div class="post-main">
+      <div class="post-header">
+        <span class="post-author ${isExpert ? 'is-expert' : ''}">${author}</span>
+        <span class="post-role-badge ${badgeClass}">${badgeText}</span>
+        ${item.time ? `<span class="post-time">${item.time}</span>` : ''}
+      </div>
+      <div class="post-content">${content || '（无内容）'}</div>
+    </div>
+  </div>`;
+}
+
+function renderSimplePost(h, keywords) {
+  let html = '';
+  if (h.question) html += renderForumPost({author:'提问者', role:'questioner', type:'post', time:h.expert_last_date||'', content:h.question}, keywords);
+  if (h.answer)   html += renderForumPost({author:'chenyiwei', role:'expert', type:'post', time:h.expert_last_date||'', content:h.answer}, keywords);
+  return html || '<div style="padding:24px;color:var(--text-dim);text-align:center;">暂无内容</div>';
+}
+
+function renderCaseContent(h, keywords) {
+  const conversation = h.conversation || [];
+  let questionRaw = '';
+  let answerContent = '';
+  for (let item of conversation) {
+    if (item.role === 'questioner') questionRaw = item.content || '';
+    else if (item.role === 'expert') answerContent = item.content || '';
+  }
+  if (!questionRaw && h.question) questionRaw = h.question;
+  if (!answerContent && h.answer) answerContent = h.answer;
+
+  let questionPart = '';
+  let backgroundPart = '';
+  const qMatch = questionRaw.match(/【问题】?\s*([\s\S]*?)(?=【背景】|$)/);
+  if (qMatch) questionPart = qMatch[1].trim();
+  const bgMatch = questionRaw.match(/【背景】?\s*([\s\S]*?)$/);
+  if (bgMatch) backgroundPart = bgMatch[1].trim();
+  if (!questionPart && !backgroundPart) questionPart = questionRaw;
+
+  let html = `<div style="padding: 20px 20px 24px;">`;
+  if (questionPart) html += `<div style="margin-bottom: 20px;"><div style="font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--accent); letter-spacing:0.1em; margin-bottom: 8px;">📋 问题</div><div style="font-size:0.88rem; color:var(--text); line-height:1.8; white-space:pre-wrap;">${highlightKeywords(questionPart, keywords)}</div></div>`;
+  if (backgroundPart) html += `<div style="margin-bottom: 24px;"><div style="font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--text-dim); letter-spacing:0.1em; margin-bottom: 8px;">📌 背景</div><div style="font-size:0.88rem; color:var(--text); line-height:1.8; white-space:pre-wrap;">${highlightKeywords(backgroundPart, keywords)}</div></div>`;
+  if (answerContent) html += `<div><div style="font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--success); letter-spacing:0.1em; margin-bottom: 8px;">✅ 解答</div><div style="font-size:0.88rem; color:var(--text); line-height:1.8; white-space:pre-wrap;">${highlightKeywords(answerContent, keywords)}</div></div>`;
+  html += `</div>`;
+  if (!questionPart && !backgroundPart && !answerContent) html = '<div style="padding:40px;text-align:center;color:var(--text-dim);">暂无内容</div>';
+  return html;
+}
+
+function openModal(idx) {
+  const h = state.hits[idx];
+  if (!h) return;
+  const keywords = state.query ? state.query.split(/\s+/).filter(Boolean) : [];
+  const sourceType = h.source_type || 'expert';
+  document.getElementById('modalTitle').textContent = h.title || '（无标题）';
+  const metaEl = document.getElementById('modalMeta');
+  let metaHtml = '';
+  if (h.expert_last_date) metaHtml += `<span class="tag tag-date">最后回复 ${h.expert_last_date}</span>`;
+  if (sourceType === 'case') metaHtml += `<span class="tag" style="background:var(--info-light);color:var(--info);border:1px solid var(--info-border);">📘 ${h.source || '实务案例'}</span>`;
+  else if (h.source) metaHtml += `<span class="tag tag-expert">${h.source}</span>`;
+  if (h.url) metaHtml += `<a href="${h.url}" target="_blank">🔗 原帖</a>`;
+  metaEl.innerHTML = metaHtml;
+  const bodyEl = document.getElementById('modalBody');
+  if (sourceType === 'case') bodyEl.innerHTML = renderCaseContent(h, keywords);
+  else {
+    const conversation = h.conversation || [];
+    bodyEl.innerHTML = conversation.length ? conversation.map(item => renderForumPost(item, keywords)).join('') : renderSimplePost(h, keywords);
+  }
+  document.getElementById('modalFooterInfo').textContent = '';
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function toggleClearBtn() {
+  const val = document.getElementById('expertInput').value;
+  document.getElementById('clearBtn').style.display = val ? 'block' : 'none';
+}
+function clearSearch() {
+  document.getElementById('expertInput').value = '';
+  document.getElementById('clearBtn').style.display = 'none';
+  state.query = '';
+  state.page = 0;
+  loadExpert(0);
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+</script>
+</body>
+</html>

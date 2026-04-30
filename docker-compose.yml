@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: finwise-meilisearch
+    restart: unless-stopped
+    ports:
+      - "8800:8800"
+    volumes:
+      - ./meilisearch_data:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_ENV=production
