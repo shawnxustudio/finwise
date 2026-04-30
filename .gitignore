@@ -1,8 +1,6 @@
 .env
 .claude/
 meilisearch_data/
-data/source/*
-!data/source/.gitkeep
 data/import/*
 !data/import/.gitkeep
 __pycache__/

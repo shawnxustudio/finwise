@@ -38,7 +38,7 @@ MAX_PAGE        = 1000
 INC_STOP_PAGES  = 3
 
 OUTPUT_JSON     = Path("./data/import/chenyiwei.json")
-CHECKPOINT_FILE = Path("./data/source/checkpoint.json")
+CHECKPOINT_FILE = Path("./data/import/checkpoint.json")
 # ============================================================
 
 HEADERS = {
