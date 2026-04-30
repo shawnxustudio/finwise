@@ -452,7 +452,7 @@ def run_full(cp, done_tids, results):
 
 
 def run_incremental(cp, done_tids, results):
-    last_time_str = cp.get("last_full_crawl_time") or cp.get("last_incremental_time")
+    last_time_str = cp.get("last_incremental_time") or cp.get("last_full_crawl_time")
     if not last_time_str:
         print("【增量模式】未找到上次爬取时间，请先跑全量模式")
         return 0
