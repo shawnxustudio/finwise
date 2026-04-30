@@ -167,10 +167,17 @@ def get_forum_thread_list(page):
         title_text = a.get_text(strip=True)
         if not title_text:
             continue
-        spans = tbody.find_all("span", title=True)
+        # Discuz! uses two td.by cells: author and last-reply; use the last one
         last_reply_time = None
-        if spans:
-            last_reply_time = parse_time(spans[-1].get("title", ""))
+        td_by_list = tbody.select("td.by")
+        if len(td_by_list) >= 2:
+            time_span = td_by_list[-1].select_one("span[title]")
+            if time_span:
+                last_reply_time = parse_time(time_span.get("title", ""))
+        if last_reply_time is None:
+            spans = tbody.find_all("span", title=True)
+            if spans:
+                last_reply_time = parse_time(spans[-1].get("title", ""))
         threads.append({
             "tid": tid,
             "url": f"{BASE_URL}/thread-{tid}-1-1.html",
@@ -407,7 +414,8 @@ def run_full(cp, done_tids, results):
             sleep()
 
         if not has_next or page >= MAX_PAGE:
-            cp["last_full_crawl_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+            if total_checked > 0:
+                cp["last_full_crawl_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
             save_json(CHECKPOINT_FILE, cp)
             print("\n全量爬取完成！")
             break
@@ -443,7 +451,8 @@ def run_incremental(cp, done_tids, results):
         all_old = True
         for t in threads:
             lrt = t.get("last_reply_time")
-            if lrt and last_time and lrt <= last_time:
+            # lrt is None means unparseable time → treat as old to avoid stale scraping
+            if lrt is None or (last_time and lrt <= last_time):
                 continue
             all_old = False
             new_threads.append(t)
