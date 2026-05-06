@@ -100,9 +100,9 @@ body::before {
 
 .nav-logo { font-family:'DM Mono',monospace; font-size:0.78rem; font-weight:500; color:var(--accent); letter-spacing:0.06em; padding:0 14px; white-space:nowrap; position:relative; z-index:4; flex-shrink:0; }
 .nav-tab {
-    flex:none; height:36px; border:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; border-radius:15px;
-    font-size:0; color:rgba(38,34,65,0.52); background:transparent; padding:0 20px;
+    flex:none; width:40px; height:36px; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; border-radius:13px;
+    font-size:0; color:rgba(38,34,65,0.52); background:transparent; padding:0;
     position:relative; z-index:4;
     transition:color 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.55,1);
 }
@@ -273,7 +273,7 @@ body::before {
 .modal-footer-info { font-family:'DM Mono',monospace; font-size:0.60rem; color:var(--text-dim); }
 @media (max-width: 500px) {
   .nav-float { width: calc(100% - 32px); padding: 4px; gap: 3px; }
-  .nav-tab { flex: 1; padding: 0 8px; font-size: 0.74rem; }
+  .nav-tab { flex: none; width: 38px; }
   .sb-btn { padding: 0 12px; font-size: 0.75rem; }
 }
 </style>
