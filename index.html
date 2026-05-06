@@ -633,7 +633,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 
   function rect(btn) {
     const nr = nav.getBoundingClientRect(), br = btn.getBoundingClientRect();
-    return { left: br.left - nr.left - 5, width: br.width };
+    return { left: br.left - nr.left, width: br.width };
   }
 
   function moveInd(btn, animate, dir) {
