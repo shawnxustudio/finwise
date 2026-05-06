@@ -101,16 +101,15 @@ body::before {
 .nav-logo { font-family:'DM Mono',monospace; font-size:0.78rem; font-weight:500; color:var(--accent); letter-spacing:0.06em; padding:0 14px; white-space:nowrap; position:relative; z-index:4; flex-shrink:0; }
 .nav-tab {
     flex:none; height:36px; border:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; gap:5px; border-radius:15px;
-    font-family:'Noto Serif SC',serif; font-size:0.80rem; font-weight:600;
-    color:rgba(38,34,65,0.52); background:transparent; white-space:nowrap; padding:0 20px;
+    display:flex; align-items:center; justify-content:center; border-radius:15px;
+    font-size:0; color:rgba(38,34,65,0.52); background:transparent; padding:0 20px;
     position:relative; z-index:4;
     transition:color 0.22s ease, transform 0.28s cubic-bezier(0.34,1.2,0.55,1);
 }
 .nav-tab:hover { color:rgba(28,24,52,0.80); }
 .nav-tab.active { color:rgba(22,20,45,0.90); font-weight:700; }
 .nav-tab:active { transform:scale(0.92); transition:transform 0.09s ease; }
-.nav-tab svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2.0; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.nav-tab svg { display:block; width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2.0; stroke-linecap:round; stroke-linejoin:round; }
 
 /* ══ 页面容器 ══ */
 .page { display:none; padding:80px 16px 80px; max-width:900px; margin:0 auto; }
