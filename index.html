@@ -673,8 +673,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     moveInd(btn, true, dir);
   }
 
-  requestAnimationFrame(() => requestAnimationFrame(() => moveInd(activeTab, false, 0)));
-  document.fonts.ready.then(() => requestAnimationFrame(() => moveInd(activeTab, false, 0)));
+  // 等动画结束 + 字体就绪，两者都满足才计算初始位置
+  let animDone = false, fontsDone = false;
+  function tryInit() {
+    if (animDone && fontsDone) requestAnimationFrame(() => moveInd(activeTab, false, 0));
+  }
+  nav.addEventListener('animationend', () => { animDone = true; tryInit(); }, { once: true });
+  document.fonts.ready.then(() => { fontsDone = true; tryInit(); });
 
   window._navActivate = activate;
   window._navShine = triggerShine;
