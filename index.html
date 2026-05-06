@@ -135,12 +135,12 @@ body::before {
     backdrop-filter:var(--blur-md); -webkit-backdrop-filter:var(--blur-md);
     border:1px solid rgba(255,255,255,0.72);
     outline:1px solid rgba(180,174,210,0.22); outline-offset:-1px;
-    border-radius:var(--radius-lg); padding:8px 8px 8px 16px; box-shadow:var(--shadow);
+    border-radius:var(--radius-lg); padding:5px 5px 5px 14px; box-shadow:var(--shadow);
 }
-.search-bar input { flex:1; border:none; background:transparent; font-family:'Noto Serif SC',serif; font-size:0.92rem; color:var(--text); outline:none; }
+.search-bar input { flex:1; border:none; background:transparent; font-family:'Noto Serif SC',serif; font-size:0.88rem; color:var(--text); outline:none; }
 .search-bar input::placeholder { color:var(--text-dim); }
 .search-bar button {
-    padding:9px 20px; border:none; border-radius:12px; cursor:pointer;
+    padding:7px 18px; border:none; border-radius:11px; cursor:pointer;
     font-family:'Noto Serif SC',serif; font-size:0.82rem; font-weight:600;
     background:var(--accent); color:white;
     box-shadow:0 4px 16px rgba(74,74,203,0.30);
@@ -305,7 +305,7 @@ body::before {
   <div id="page-expert" class="page">
     <div class="search-bar">
       <input type="text" id="expertInput" placeholder="搜索关键词，留空显示全部…" onkeydown="if(event.key==='Enter')doSearch()" oninput="toggleClearBtn()">
-      <button id="clearBtn" onclick="clearSearch()" style="display:none;padding:9px 14px;border:none;border-radius:12px;cursor:pointer;font-size:0.82rem;font-weight:600;background:var(--glass-active);color:var(--text-muted);border:1px solid var(--glass-border2);transition:all 0.18s;white-space:nowrap;">✕ 清除</button>
+      <button id="clearBtn" onclick="clearSearch()" style="display:none;padding:7px 12px;border:none;border-radius:11px;cursor:pointer;font-size:0.82rem;font-weight:600;background:var(--glass-active);color:var(--text-muted);border:1px solid var(--glass-border2);transition:all 0.18s;white-space:nowrap;">✕ 清除</button>
       <button onclick="doSearch()">搜索</button>
     </div>
     <div id="expertResults">
