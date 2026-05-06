@@ -674,6 +674,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
   }
 
   requestAnimationFrame(() => requestAnimationFrame(() => moveInd(activeTab, false, 0)));
+  document.fonts.ready.then(() => requestAnimationFrame(() => moveInd(activeTab, false, 0)));
 
   window._navActivate = activate;
   window._navShine = triggerShine;
